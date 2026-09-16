@@ -73,7 +73,7 @@ One `Cluster` is safe for concurrent unary calls. Same connection = same holder 
 
 `ttl` is seconds. `close()` stops Watch, unlocks, and revokes what this process still holds. Failures throw `ClusdrError`.
 
-Full surface: [TypeScript SDK](https://clusdr.io/docs/sdk/typescript). Runnable copies (Go, Python, Rust, and TypeScript): [examples](https://github.com/clusdr/clusdr/tree/main/examples).
+Full surface: [TypeScript SDK](https://clusdr.io/docs/sdk/typescript). Runnable copies (Go, Python, Rust, TypeScript, and Java): [examples](https://github.com/clusdr/clusdr/tree/main/examples).
 
 ## TLS
 
