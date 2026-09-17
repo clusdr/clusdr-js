@@ -1,12 +1,14 @@
 export interface Member {
   id: string;
   address: string;
+  /** Liveness: `alive` or `dead`. A left id is gone from `members()`. */
   status: string;
   leader: boolean;
   role: string;
 }
 
 export interface Event {
+  /** `member.join`, `member.dead` (crash, still listed), `member.left` (`clusdr leave`, gone), … */
   type: string;
   source: string;
   payload: Uint8Array;
