@@ -28,12 +28,12 @@ CI lints PR commits. Prefer squash-merge; the squash title must stay conventiona
 
 ## Requirements
 
-Node.js 20+.
+Node.js 20+. [Buf](https://buf.build/docs/cli/installation) to refresh vendored proto.
 
 ```bash
 npm install
-make proto    # copy .proto from ../clusdr/proto
+make proto    # export buf.build/clusdr/api (sibling ../clusdr/proto/api, else BSR, else GitHub)
 npm test
 ```
 
-`.proto` files live under `proto/`. Do not hand-edit them; copy from the daemon repo. The public API is the TypeScript wrapper, not the generated gRPC shapes.
+`.proto` files live under `proto/`. Do not hand-edit them; export from [`buf.build/clusdr/api`](https://buf.build/clusdr/api) (or the sibling daemon checkout). `join` / `heartbeat` are `buf.build/clusdr/internal` and are not exported. The public API is the TypeScript wrapper, not the generated gRPC shapes.

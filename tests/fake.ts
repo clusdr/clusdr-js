@@ -8,18 +8,20 @@ import {
 } from "@grpc/grpc-js";
 
 import {
-  type GrantLeaseRequest,
-  type GrantLeaseResponse,
+  type GrantRequest,
+  type GrantResponse,
   type LockRequest,
   type LockResponse,
+  type TryLockRequest,
+  type TryLockResponse,
   type PublishEventRequest,
   type PublishEventResponse,
-  type RenewLeaseRequest,
-  type RenewLeaseResponse,
-  type RenewLockRequest,
-  type RenewLockResponse,
-  type RevokeLeaseRequest,
-  type RevokeLeaseResponse,
+  type LeaseServiceRenewRequest,
+  type LeaseServiceRenewResponse,
+  type LockServiceRenewRequest,
+  type LockServiceRenewResponse,
+  type RevokeRequest,
+  type RevokeResponse,
   type UnlockRequest,
   type UnlockResponse,
   type WatchRequest,
@@ -368,8 +370,8 @@ function locksImpl(table: CoordTable) {
       callback({ code: status.CANCELLED, message: "cancelled" } as never);
     },
     tryLock(
-      call: ServerUnaryCall<LockRequest, LockResponse>,
-      callback: sendUnaryData<LockResponse>,
+      call: ServerUnaryCall<TryLockRequest, TryLockResponse>,
+      callback: sendUnaryData<TryLockResponse>,
     ) {
       const [rec, ok] = table.acquireLock(call.request.name, call.request.holder, ttlS(call.request.ttlMs));
       if (!ok) {
@@ -403,8 +405,8 @@ function locksImpl(table: CoordTable) {
       callback(null, { released: true, message: "" });
     },
     renew(
-      call: ServerUnaryCall<RenewLockRequest, RenewLockResponse>,
-      callback: sendUnaryData<RenewLockResponse>,
+      call: ServerUnaryCall<LockServiceRenewRequest, LockServiceRenewResponse>,
+      callback: sendUnaryData<LockServiceRenewResponse>,
     ) {
       try {
         const cur = table.locks.get(call.request.name);
@@ -431,8 +433,8 @@ function locksImpl(table: CoordTable) {
 function leasesImpl(table: CoordTable) {
   return {
     grant(
-      call: ServerUnaryCall<GrantLeaseRequest, GrantLeaseResponse>,
-      callback: sendUnaryData<GrantLeaseResponse>,
+      call: ServerUnaryCall<GrantRequest, GrantResponse>,
+      callback: sendUnaryData<GrantResponse>,
     ) {
       const [rec, ok] = table.grantLease(call.request.name, call.request.owner, ttlS(call.request.ttlMs));
       if (!ok) {
@@ -454,8 +456,8 @@ function leasesImpl(table: CoordTable) {
       });
     },
     renew(
-      call: ServerUnaryCall<RenewLeaseRequest, RenewLeaseResponse>,
-      callback: sendUnaryData<RenewLeaseResponse>,
+      call: ServerUnaryCall<LeaseServiceRenewRequest, LeaseServiceRenewResponse>,
+      callback: sendUnaryData<LeaseServiceRenewResponse>,
     ) {
       try {
         const cur = table.leases.get(call.request.name);
@@ -477,8 +479,8 @@ function leasesImpl(table: CoordTable) {
       }
     },
     revoke(
-      call: ServerUnaryCall<RevokeLeaseRequest, RevokeLeaseResponse>,
-      callback: sendUnaryData<RevokeLeaseResponse>,
+      call: ServerUnaryCall<RevokeRequest, RevokeResponse>,
+      callback: sendUnaryData<RevokeResponse>,
     ) {
       try {
         table.revokeLease(call.request.name, call.request.owner, call.request.fencingToken);

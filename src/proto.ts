@@ -90,6 +90,20 @@ export interface LockResponse {
   deadlineUnixMs: number;
 }
 
+export interface TryLockRequest {
+  name: string;
+  holder: string;
+  ttlMs: number;
+}
+
+export interface TryLockResponse {
+  acquired: boolean;
+  message: string;
+  fencingToken: number;
+  holder: string;
+  deadlineUnixMs: number;
+}
+
 export interface UnlockRequest {
   name: string;
   holder: string;
@@ -101,27 +115,27 @@ export interface UnlockResponse {
   message: string;
 }
 
-export interface RenewLockRequest {
+export interface LockServiceRenewRequest {
   name: string;
   holder: string;
   fencingToken: number;
   ttlMs: number;
 }
 
-export interface RenewLockResponse {
+export interface LockServiceRenewResponse {
   renewed: boolean;
   message: string;
   fencingToken: number;
   deadlineUnixMs: number;
 }
 
-export interface GrantLeaseRequest {
+export interface GrantRequest {
   name: string;
   owner: string;
   ttlMs: number;
 }
 
-export interface GrantLeaseResponse {
+export interface GrantResponse {
   granted: boolean;
   message: string;
   fencingToken: number;
@@ -129,27 +143,27 @@ export interface GrantLeaseResponse {
   deadlineUnixMs: number;
 }
 
-export interface RenewLeaseRequest {
+export interface LeaseServiceRenewRequest {
   name: string;
   owner: string;
   fencingToken: number;
   ttlMs: number;
 }
 
-export interface RenewLeaseResponse {
+export interface LeaseServiceRenewResponse {
   renewed: boolean;
   message: string;
   fencingToken: number;
   deadlineUnixMs: number;
 }
 
-export interface RevokeLeaseRequest {
+export interface RevokeRequest {
   name: string;
   owner: string;
   fencingToken: number;
 }
 
-export interface RevokeLeaseResponse {
+export interface RevokeResponse {
   revoked: boolean;
   message: string;
 }
@@ -190,16 +204,16 @@ export interface WatchClient {
 
 export interface LockClient {
   lock: UnaryCall<LockRequest, LockResponse>;
-  tryLock: UnaryCall<LockRequest, LockResponse>;
+  tryLock: UnaryCall<TryLockRequest, TryLockResponse>;
   unlock: UnaryCall<UnlockRequest, UnlockResponse>;
-  renew: UnaryCall<RenewLockRequest, RenewLockResponse>;
+  renew: UnaryCall<LockServiceRenewRequest, LockServiceRenewResponse>;
   close(): void;
 }
 
 export interface LeaseClient {
-  grant: UnaryCall<GrantLeaseRequest, GrantLeaseResponse>;
-  renew: UnaryCall<RenewLeaseRequest, RenewLeaseResponse>;
-  revoke: UnaryCall<RevokeLeaseRequest, RevokeLeaseResponse>;
+  grant: UnaryCall<GrantRequest, GrantResponse>;
+  renew: UnaryCall<LeaseServiceRenewRequest, LeaseServiceRenewResponse>;
+  revoke: UnaryCall<RevokeRequest, RevokeResponse>;
   close(): void;
 }
 

@@ -2,10 +2,11 @@ import { status } from "@grpc/grpc-js";
 
 import { ClusdrError, wrap } from "./error.js";
 import {
-  type GrantLeaseResponse,
+  type GrantResponse,
   type LeaseClient,
   type LockClient,
   type LockResponse,
+  type TryLockResponse,
   unary,
 } from "./proto.js";
 import { isServiceError, remainingMs, retry } from "./retry.js";
@@ -67,7 +68,7 @@ export class Coord {
       return existing;
     }
     const deadline = this.#host.deadline(timeout);
-    let resp: LockResponse;
+    let resp: TryLockResponse;
     try {
       resp = await retry(
         () =>
@@ -103,7 +104,7 @@ export class Coord {
       return existing;
     }
     const deadline = this.#host.deadline(timeout);
-    let resp: GrantLeaseResponse;
+    let resp: GrantResponse;
     try {
       resp = await retry(
         () =>
@@ -199,7 +200,7 @@ export class Coord {
     return this.#mu.run(() => this.#leased.get(name));
   }
 
-  private async adoptLock(resp: LockResponse, name: string, ttl?: number): Promise<Lock> {
+  private async adoptLock(resp: LockResponse | TryLockResponse, name: string, ttl?: number): Promise<Lock> {
     const lk = new Lock(name, resp.holder || this.#host.holder, resp.fencingToken, fromMs(resp.deadlineUnixMs));
     const existing = await this.#mu.run(() => {
       const cur = this.#held.get(name);
@@ -216,7 +217,7 @@ export class Coord {
     return lk;
   }
 
-  private async adoptLease(resp: GrantLeaseResponse, name: string, ttl?: number): Promise<Lease> {
+  private async adoptLease(resp: GrantResponse, name: string, ttl?: number): Promise<Lease> {
     const ls = new Lease(name, resp.owner || this.#host.holder, resp.fencingToken, fromMs(resp.deadlineUnixMs));
     const existing = await this.#mu.run(() => {
       const cur = this.#leased.get(name);
